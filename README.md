@@ -93,6 +93,18 @@ app.js
 ## 📚 Créditos
 
 Proyecto realizado para la asignatura de **Informática II** bajo la supervisión del profesor **Raúl Sacristán**.
-Jose Carlos Zorrilla
-Mohamed ElGhali Sabil
 
+
+
+## 👨‍💻 Creadores
+
+- Jose Carlos Zorrilla
+- Mohamed ElGhali Sabil
+
+
+---
+
+## ⚖️ Derechos de Autor
+
+© 2025 Proyecto académico realizado para la Universidad Alfonso X El Sabio (UAX).  
+Todos los derechos reservados. Uso exclusivo con fines educativos.
