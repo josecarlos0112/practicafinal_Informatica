@@ -104,7 +104,7 @@ app.get("/user", authenticateToken, (req, res) => {
 });
 
 // 📌 Ruta para obtener usuarios desde MySQL
-app.get("/usuarios", (req, res) => {
+app.get("/3", (req, res) => {
     db.query("SELECT * FROM usuarios", (err, results) => {
         if (err) {
             console.error("❌ Error en consulta:", err);
@@ -119,4 +119,43 @@ app.get("/usuarios", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+});
+
+// 📌 Crear nueva reserva
+app.post("/reserve", authenticateToken, (req, res) => {
+    const { chargerId, locationName } = req.body;
+    const userId = req.user.id;
+    const currentDate = new Date();
+
+    if (!chargerId || !locationName) {
+        return res.status(400).json({ message: "ID de cargador y ubicación son requeridos" });
+    }
+
+    const sql = "INSERT INTO reservas (usuario_id, cargador_id, ubicacion, fecha_reserva) VALUES (?, ?, ?, ?)";
+    db.query(sql, [userId, chargerId, locationName, currentDate], (err, result) => {
+        if (err) {
+            console.error("❌ Error creando reserva:", err);
+            return res.status(500).json({ error: "Error del servidor" });
+        }
+        res.json({ message: "Reserva creada exitosamente" });
+    });
+});
+
+// 📌 Obtener historial de reservas del usuario autenticado
+app.get("/reservations", authenticateToken, (req, res) => {
+    const userId = req.user.id;
+
+    const sql = `
+        SELECT id, cargador_id, ubicacion, fecha_reserva
+        FROM reservas
+        WHERE usuario_id = ?
+        ORDER BY fecha_reserva DESC
+    `;
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error("❌ Error obteniendo historial:", err);
+            return res.status(500).json({ error: "Error del servidor" });
+        }
+        res.json(results);
+    });
 });
