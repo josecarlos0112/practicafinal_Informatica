@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const map = L.map('map').setView([40.4168, -3.7038], 12);
+    // Inicializar mapa
+    const map = L.map('map').setView([40.4168, -3.7038], 15); // Centro en Madrid
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -21,19 +22,30 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(`${API_BACKEND}/chargers`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            cargadoresData = await response.json();
+
+            if (response.status === 401 || response.status === 403) {
+                alert('⚠️ Sesión expirada o acceso denegado. Por favor inicia sesión nuevamente.');
+                localStorage.removeItem('token');
+                window.location.href = '../pages/login.html';
+                return;
+            }
+
+            const cargadores = await response.json();
+            cargadoresData = cargadores;
             mostrarCargadores('todos');
+
         } catch (error) {
-            console.error("Error al cargar cargadores:", error);
+            console.error('Error al cargar cargadores:', error);
         }
     }
+
 
     function mostrarCargadores(filtro) {
         markersGroup.clearLayers(); // Limpiar marcadores actuales
 
         cargadoresData.forEach(cargador => {
             if (filtro === 'todos' || cargador.estado === filtro) {
-                const { id, ubicacion, latitud, longitud, estado } = cargador;
+                const { id, ubicacion, latitud, longitud, estado, nivel_carga } = cargador;
 
                 if (latitud && longitud) {
                     const marker = L.marker([latitud, longitud], {
@@ -48,7 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (estado === 'libre') {
                         marker.bindPopup(`
                             <strong>${ubicacion}</strong><br>
-                            <button class="btn btn-primary btn-sm mt-2" onclick="reservarCargador('${id}', '${ubicacion}')">
+                            <p>Nivel Bateria: ${Math.floor(nivel_carga)}%</p>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="reservarCargador('${id}', '${ubicacion}', '${nivel_carga}')">
                                 Reservar este cargador
                             </button>
                         `);
