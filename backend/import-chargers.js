@@ -12,7 +12,7 @@ const dbConfig = {
 };
 
 // URL de Open Charge Map API (cargadores en Madrid)
-const API_OPENCHARGEMAP = 'https://api.openchargemap.io/v3/poi/?output=json&countrycode=ES&latitude=40.4168&longitude=-3.7038&distance=20&maxresults=10';
+const API_OPENCHARGEMAP = 'https://api.openchargemap.io/v3/poi/?output=json&countrycode=ES&latitude=40.4168&longitude=-3.7038&distance=50&maxresults=200';
 
 async function importarCargadores() {
     let connection;
@@ -24,7 +24,7 @@ async function importarCargadores() {
         const response = await fetch(API_OPENCHARGEMAP, {
             headers: {
                 'User-Agent': 'app-informatica',
-                'X-API-Key': '08dc116c-ae15-4377-aa52-545e5cdb4586' // 🔥 Tu API Key real aquí
+                'X-API-Key': '08dc116c-ae15-4377-aa52-545e5cdb4586' // 🔥 API para Open Charge Map
             }
         });
 

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const API_BACKEND = "http://localhost:5000"; // URL del backend
+    const API_BACKEND = "http://localhost:5000";
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -7,55 +7,65 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Inicializar el mapa
-    const map = L.map('map').setView([40.4168, -3.7038], 12); // Centro Madrid
+    const map = L.map('map').setView([40.4168, -3.7038], 12);
 
-    // Cargar capa base de OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Función para cargar cargadores
+    let markersGroup = L.layerGroup().addTo(map); // Grupo para poder limpiar marcadores
+    let cargadoresData = []; // Guardar cargadores en memoria
+
     async function cargarCargadores() {
         try {
             const response = await fetch(`${API_BACKEND}/chargers`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const cargadores = await response.json();
+            cargadoresData = await response.json();
+            mostrarCargadores('todos');
+        } catch (error) {
+            console.error("Error al cargar cargadores:", error);
+        }
+    }
 
-            cargadores.forEach(cargador => {
-                const { id, location, latitud, longitud, estado } = cargador;
+    function mostrarCargadores(filtro) {
+        markersGroup.clearLayers(); // Limpiar marcadores actuales
+
+        cargadoresData.forEach(cargador => {
+            if (filtro === 'todos' || cargador.estado === filtro) {
+                const { id, ubicacion, latitud, longitud, estado } = cargador;
 
                 if (latitud && longitud) {
                     const marker = L.marker([latitud, longitud], {
                         icon: L.icon({
-                            iconUrl: estado === 'ocupado' ? '../img/marker-red.png' : '../img/romo.png',
+                            iconUrl: estado === 'ocupado' ? '../img/marker-red.png' : '../img/marker-green.png',
                             iconSize: [25, 41],
                             iconAnchor: [12, 41],
                             popupAnchor: [1, -34],
                         })
-                    }).addTo(map);
+                    }).addTo(markersGroup);
 
                     if (estado === 'libre') {
                         marker.bindPopup(`
-                            <strong>${location}</strong><br>
-                            <button class="btn btn-primary btn-sm mt-2" onclick="reservarCargador('${id}', '${location}')">
+                            <strong>${ubicacion}</strong><br>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="reservarCargador('${id}', '${ubicacion}')">
                                 Reservar este cargador
                             </button>
                         `);
                     } else {
                         marker.bindPopup(`
-                            <strong>${location}</strong><br>
+                            <strong>${ubicacion}</strong><br>
                             <span class="text-danger">Cargador ocupado</span>
                         `);
                     }
                 }
-            });
-
-        } catch (error) {
-            console.error("Error al cargar cargadores:", error);
-        }
+            }
+        });
     }
+
+    document.getElementById('filtro-todos').addEventListener('click', () => mostrarCargadores('todos'));
+    document.getElementById('filtro-libres').addEventListener('click', () => mostrarCargadores('libre'));
+    document.getElementById('filtro-ocupados').addEventListener('click', () => mostrarCargadores('ocupado'));
 
     cargarCargadores();
 });
@@ -76,7 +86,7 @@ async function reservarCargador(chargerId, locationName) {
 
         if (res.ok) {
             alert("Reserva realizada con éxito. Actualizando mapa...");
-            location.reload(); // Recarga la página para ver los cambios
+            location.reload(); // Puedes mejorar esto refrescando markers solamente
         } else {
             alert("Error al reservar cargador.");
         }
