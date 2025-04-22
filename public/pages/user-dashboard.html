@@ -49,6 +49,39 @@
             </div>
 
             <div id="map" style="height: 600px; width: 100%; border: 2px solid #555; border-radius: 10px;"></div>
+            <!-- Modal para reservar cargador -->
+            <div class="modal fade" id="modalReserva" tabindex="-1" aria-labelledby="modalReservaLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content bg-dark text-white">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalReservaLabel">Reservar Cargador</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formReserva">
+                                <div class="mb-3">
+                                    <label for="ubicacionCargador" class="form-label">Ubicación</label>
+                                    <input type="text" class="form-control" id="ubicacionCargador" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="fechaReserva" class="form-label">Fecha de Reserva</label>
+                                    <input type="date" class="form-control" id="fechaReserva" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="horaReserva" class="form-label">Hora Aproximada</label>
+                                    <input type="time" class="form-control" id="horaReserva" required>
+                                </div>
+                                <input type="hidden" id="idCargador">
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" form="formReserva">Confirmar Reserva</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
     </div>

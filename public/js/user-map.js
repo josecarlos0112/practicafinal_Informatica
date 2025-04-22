@@ -84,26 +84,47 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Función para reservar cargador
-async function reservarCargador(chargerId, locationName) {
-    const token = localStorage.getItem("token");
+function reservarCargador(chargerId, locationName) {
+    // Llenar datos en el modal
+    document.getElementById('ubicacionCargador').value = locationName;
+    document.getElementById('idCargador').value = chargerId;
+
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalReserva'));
+    modal.show();
+}
+
+document.getElementById('formReserva').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    const chargerId = document.getElementById('idCargador').value;
+    const locationName = document.getElementById('ubicacionCargador').value;
+    const fecha = document.getElementById('fechaReserva').value;
+    const hora = document.getElementById('horaReserva').value;
 
     try {
-        const res = await fetch("http://localhost:5000/reserve", {
-            method: "POST",
+        const res = await fetch(`${API_BACKEND}/reserve`, {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ chargerId, locationName })
+            body: JSON.stringify({
+                chargerId,
+                locationName,
+                fecha,
+                hora
+            })
         });
 
         if (res.ok) {
-            alert("Reserva realizada con éxito. Actualizando mapa...");
-            location.reload(); // Puedes mejorar esto refrescando markers solamente
+            alert('✅ Reserva realizada con éxito.');
+            window.location.reload();
         } else {
-            alert("Error al reservar cargador.");
+            alert('⚠️ Error al realizar la reserva.');
         }
     } catch (error) {
-        console.error("Error al enviar reserva:", error);
+        console.error('Error enviando reserva:', error);
     }
-}
+});
