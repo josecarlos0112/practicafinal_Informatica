@@ -3,20 +3,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const logoutButton = document.querySelector("#logoutButton");
     const API_URL = "http://localhost:5000"; // Backend URL
 
-    // Redirigir según el rol si está en una página incorrecta
     const rolePaths = {
-        "1": "../pages/admin-dashboard.html",
-        "2": "../pages/user-dashboard.html",
-        "3": "../pages/tech-dashboard.html"
+        1: "../pages/admin-dashboard.html", // Admin
+        2: "../pages/user-dashboard.html",  // Usuario
+        3: "../pages/tech-dashboard.html"   // Técnico
     };
 
     function checkAuthentication() {
         const token = localStorage.getItem("token");
-        const role = localStorage.getItem("role");
+        const role = parseInt(localStorage.getItem("role")); // 👈 Convertir a número
         const currentPath = window.location.pathname;
 
         if (!token) {
-            // Si no hay token y la página no es el login, redirigir al login
+            // Si no hay token y no estamos en login, redirigir al login
             if (!currentPath.includes("login.html")) {
                 window.location.href = "/pages/login.html";
             }
@@ -24,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (rolePaths[role] && !currentPath.includes(rolePaths[role])) {
-            window.location.href = rolePaths[data.role];
+            window.location.href = rolePaths[role]; // 👈 Usar role directamente
         }
     }
 
@@ -60,7 +59,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             alert("Inicio de sesión exitoso. Redirigiendo...");
 
-            window.location.href = rolePaths[data.role];
+            // Redirigir al dashboard correspondiente
+            const redirectPath = rolePaths[data.role];
+            if (redirectPath) {
+                window.location.href = redirectPath;
+            } else {
+                alert("Rol desconocido. No se puede redirigir.");
+            }
+
         } catch (error) {
             alert(error.message);
         }
