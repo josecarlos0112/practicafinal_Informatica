@@ -3,20 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Usuario</title>
+    <title>Encuentra tu Cargador - Usuario</title>
+    <!-- CSS de la plantilla -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/icons.css">
+    <!-- Leaflet CSS para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 </head>
 <body>
-<header>
-    <h1>Panel de Usuario</h1>
-    <button id="logoutButton">Cerrar Sesión</button>
-</header>
-<nav>
-    <ul id="nav-links"></ul>
+<!-- Navbar superior -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Encuentra tu Cargador</a>
+        <button class="btn btn-danger" id="logoutButton">Cerrar Sesión</button>
+    </div>
 </nav>
-<main>
-    <section id="dashboard-content"></section>
-</main>
-<script src="../js/dashboard.js"></script>
+
+<!-- Layout con Sidebar y Contenido -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar lateral -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">
+                            <i class="bi bi-geo-alt"></i>
+                            Mapa de Cargadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-clock-history"></i>
+                            Historial de Reservas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <h2 class="mt-4">Mapa de Cargadores</h2>
+            <div id="map" style="height: 600px; width: 100%;"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container">
+        <span class="text-muted">&copy; 2025 Encuentra tu Cargador. Todos los derechos reservados.</span>
+    </div>
+</footer>
+
+<!-- JS de la plantilla -->
+<script src="../js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<!-- Leaflet JS para el mapa -->
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<!-- Archivo propio para cargar el mapa -->
+<script src="../js/user-map.js"></script>
 </body>
 </html>
