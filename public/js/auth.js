@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Redirigir según el rol si está en una página incorrecta
     const rolePaths = {
-        "admin": "/pages/admin-dashboard.html",
-        "user": "/pages/user-dashboard.html",
-        "tech": "/pages/tech-dashboard.html"
+        "1": "../pages/admin-dashboard.html",
+        "2": "../pages/user-dashboard.html",
+        "3": "../pages/tech-dashboard.html"
     };
 
     function checkAuthentication() {
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (rolePaths[role] && !currentPath.includes(rolePaths[role])) {
-            window.location.href = rolePaths[role];
+            window.location.href = rolePaths[data.role];
         }
     }
 

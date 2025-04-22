@@ -49,7 +49,7 @@ const users = {
     "tec@tec.com": { password: "123", role: "tech" }
 };
 
-// 📌 Ruta para autenticar usuario
+// 📌 Ruta para autenticar usuario (USANDO BASE DE DATOS REAL)
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
@@ -58,7 +58,6 @@ app.post("/login", (req, res) => {
     }
 
     const sql = "SELECT * FROM usuarios WHERE email = ?";
-
     db.query(sql, [email], (err, results) => {
         if (err) {
             console.error("❌ Error en la consulta de login:", err);
@@ -75,15 +74,17 @@ app.post("/login", (req, res) => {
             return res.status(401).json({ message: "Credenciales incorrectas" });
         }
 
+        // Generar el token JWT incluyendo id, email y rol_id
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.rol_id },
             SECRET_KEY,
             { expiresIn: "1h" }
         );
 
-        res.json({ token, role: user.rol_id });
+        res.json({ token, role: user.rol_id }); // Ahora devuelve role_id (1, 2 o 3)
     });
 });
+
 
 
 // 📌 Middleware para verificar token
