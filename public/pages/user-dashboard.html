@@ -4,66 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encuentra tu Cargador - Usuario</title>
-    <!-- CSS de la plantilla -->
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/icons.css">
-    <!-- Leaflet CSS para el mapa -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/dashboard-dark.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 </head>
-<body>
-<!-- Navbar superior -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<body class="bg-dark text-white">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Encuentra tu Cargador</a>
-        <button class="btn btn-danger" id="logoutButton">Cerrar Sesión</button>
+        <a class="navbar-brand fw-bold" href="#">🔌 Encuentra tu Cargador</a>
+        <button class="btn btn-danger" id="logoutButton">Cerrar sesión</button>
     </div>
 </nav>
 
-<!-- Layout con Sidebar y Contenido -->
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar lateral -->
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-md-block bg-dark sidebar collapse border-end border-secondary">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">
-                            <i class="bi bi-geo-alt"></i>
-                            Mapa de Cargadores
+                        <a class="nav-link active text-white" href="#">
+                            <i class="bi bi-map"></i> Mapa de Cargadores
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-clock-history"></i>
-                            Historial de Reservas
+                        <a class="nav-link text-white" href="#">
+                            <i class="bi bi-clock-history"></i> Historial de Reservas
                         </a>
                     </li>
                 </ul>
             </div>
         </nav>
 
-        <!-- Contenido principal -->
+        <!-- Main -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h2 class="mt-4">Mapa de Cargadores</h2>
-            <div id="map" style="height: 600px; width: 100%;"></div>
+            <h2 class="my-4">Mapa de Cargadores</h2>
+            <div id="map" style="height: 600px; width: 100%; border: 2px solid #555; border-radius: 10px;"></div>
         </main>
+
     </div>
 </div>
 
-<!-- Footer -->
-<footer class="footer mt-auto py-3 bg-light">
-    <div class="container">
+<footer class="footer mt-auto py-3 bg-dark border-top border-secondary">
+    <div class="container text-center">
         <span class="text-muted">&copy; 2025 Encuentra tu Cargador. Todos los derechos reservados.</span>
     </div>
 </footer>
 
-<!-- JS de la plantilla -->
-<script src="../js/bootstrap.bundle.min.js"></script>
-<script src="../js/main.js"></script>
-<!-- Leaflet JS para el mapa -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-<!-- Archivo propio para cargar el mapa -->
 <script src="../js/user-map.js"></script>
+<script src="../js/dashboard.js"></script>
 </body>
 </html>
