@@ -42,13 +42,6 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/pages/login.html"));
 });
 
-// 📌 Endpoint de login (SIMULADO, NO USA MySQL AÚN)
-const users = {
-    "admin@admin.com": { password: "123", role: "admin" },
-    "user@user.com": { password: "123", role: "user" },
-    "tec@tec.com": { password: "123", role: "tech" }
-};
-
 // 📌 Ruta para autenticar usuario (USANDO BASE DE DATOS REAL)
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
@@ -84,8 +77,6 @@ app.post("/login", (req, res) => {
         res.json({ token, role: user.rol_id }); // Ahora devuelve role_id (1, 2 o 3)
     });
 });
-
-
 
 // 📌 Middleware para verificar token
 function authenticateToken(req, res, next) {
@@ -157,6 +148,23 @@ app.get("/reservations", authenticateToken, (req, res) => {
             console.error("❌ Error obteniendo historial:", err);
             return res.status(500).json({ error: "Error del servidor" });
         }
+        res.json(results);
+    });
+});
+
+// 📌 Ruta para obtener todos los cargadores
+app.get('/chargers', authenticateToken, (req, res) => {
+    const sql = `
+        SELECT id, ubicacion, tipo, latitud, longitud, estado, nivel_carga
+        FROM cargadores
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("❌ Error al obtener cargadores:", err);
+            return res.status(500).json({ error: "Error al obtener cargadores" });
+        }
+
         res.json(results);
     });
 });
