@@ -238,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (res.ok) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("modalNuevoCargador"));
+                document.activeElement.blur();
                 modal.hide();
                 cargarCargadoresAdmin();
             } else {
