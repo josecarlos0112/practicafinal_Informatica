@@ -79,7 +79,44 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('filtro-todos').addEventListener('click', () => mostrarCargadores('todos'));
     document.getElementById('filtro-libres').addEventListener('click', () => mostrarCargadores('libre'));
     document.getElementById('filtro-ocupados').addEventListener('click', () => mostrarCargadores('ocupado'));
+    document.getElementById('formReserva').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
+        const token = localStorage.getItem('token');
+        const chargerId = document.getElementById('idCargador').value;
+        const locationName = document.getElementById('ubicacionCargador').value;
+        const fecha = document.getElementById('fechaReserva').value;
+        const hora = document.getElementById('horaReserva').value;
+
+        try {
+            const res = await fetch(`${API_BACKEND}/reserve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chargerId,
+                    locationName,
+                    fecha,
+                    hora
+                })
+            });
+
+            if (res.ok) {
+                // alert('✅ Reserva realizada con éxito.');
+                const toast = new bootstrap.Toast(document.getElementById('toastReserva'));
+                toast.show();
+                setTimeout(() => window.location.reload(), 2500);
+            } else {
+                // alert('⚠️ Error al realizar la reserva.');
+                const toast = new bootstrap.Toast(document.getElementById('toastError'));
+                toast.show();
+            }
+        } catch (error) {
+            console.error('Error enviando reserva:', error);
+        }
+    });
     cargarCargadores();
 });
 
@@ -94,37 +131,3 @@ function reservarCargador(chargerId, locationName) {
     modal.show();
 }
 
-document.getElementById('formReserva').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem('token');
-    const chargerId = document.getElementById('idCargador').value;
-    const locationName = document.getElementById('ubicacionCargador').value;
-    const fecha = document.getElementById('fechaReserva').value;
-    const hora = document.getElementById('horaReserva').value;
-
-    try {
-        const res = await fetch(`${API_BACKEND}/reserve`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                chargerId,
-                locationName,
-                fecha,
-                hora
-            })
-        });
-
-        if (res.ok) {
-            alert('✅ Reserva realizada con éxito.');
-            window.location.reload();
-        } else {
-            alert('⚠️ Error al realizar la reserva.');
-        }
-    } catch (error) {
-        console.error('Error enviando reserva:', error);
-    }
-});

@@ -115,21 +115,38 @@ app.listen(PORT, () => {
 
 // 📌 Crear nueva reserva
 app.post("/reserve", authenticateToken, (req, res) => {
-    const { chargerId, locationName } = req.body;
+    const { chargerId, fecha, hora } = req.body;
     const userId = req.user.id;
-    const currentDate = new Date();
 
-    if (!chargerId || !locationName) {
-        return res.status(400).json({ message: "ID de cargador y ubicación son requeridos" });
+    if (!chargerId || !fecha || !hora) {
+        return res.status(400).json({ message: "Faltan datos obligatorios" });
     }
 
-    const sql = "INSERT INTO reservas (usuario_id, cargador_id, ubicacion, fecha_reserva) VALUES (?, ?, ?, ?)";
-    db.query(sql, [userId, chargerId, locationName, currentDate], (err, result) => {
+    const fechaCompleta = `${fecha} ${hora}:00`; // Generamos un TIMESTAMP válido
+
+    const sqlReserva = `
+        INSERT INTO reservas (usuario_id, cargador_id, fecha_reserva, estado)
+        VALUES (?, ?, ?, 'activa')
+    `;
+
+    const sqlActualizarCargador = `
+        UPDATE cargadores SET estado = 'ocupado' WHERE id = ?
+    `;
+
+    db.query(sqlReserva, [userId, chargerId, fechaCompleta], (err) => {
         if (err) {
-            console.error("❌ Error creando reserva:", err);
-            return res.status(500).json({ error: "Error del servidor" });
+            console.error("❌ Error insertando reserva:", err);
+            return res.status(500).json({ message: "Error al guardar la reserva" });
         }
-        res.json({ message: "Reserva creada exitosamente" });
+
+        db.query(sqlActualizarCargador, [chargerId], (err2) => {
+            if (err2) {
+                console.error("❌ Error actualizando cargador:", err2);
+                return res.status(500).json({ message: "Reserva hecha, pero no se cambió el estado" });
+            }
+
+            res.json({ message: "✅ Reserva completada y cargador actualizado" });
+        });
     });
 });
 
@@ -165,6 +182,49 @@ app.get('/chargers', authenticateToken, (req, res) => {
             return res.status(500).json({ error: "Error al obtener cargadores" });
         }
 
+        res.json(results);
+    });
+});
+
+
+// 📌 Crear nueva incidencia
+app.post("/incidencias", authenticateToken, (req, res) => {
+    const { cargador_id, descripcion } = req.body;
+    const usuario_id = req.user.id;
+    const fecha = new Date();
+
+    if (!cargador_id || !descripcion) {
+        return res.status(400).json({ message: "Datos incompletos" });
+    }
+
+    const sql =
+        'INSERT INTO incidencias (cargador_id, descripcion, usuario_id, fecha_reporte, estado)\n' +
+        '    VALUES (?, ?, ?, ?, \'pendiente\')'
+    ;
+    db.query(sql, [cargador_id, descripcion, usuario_id, fecha], (err, result) => {
+        if (err) {
+            console.error("❌ Error al registrar incidencia:", err);
+            return res.status(500).json({ error: "Error del servidor" });
+        }
+        res.json({ message: "Incidencia registrada con éxito" });
+    });
+});
+
+// 📌 Obtener todas las incidencias
+app.get("/incidencias", authenticateToken, (req, res) => {
+    const sql =
+        'SELECT i.*, c.ubicacion, u.email\n' +
+        '    FROM incidencias i\n' +
+        '    JOIN cargadores c ON i.cargador_id = c.id\n' +
+        '    JOIN usuarios u ON i.usuario_id = u.id\n' +
+        '    ORDER BY fecha_reporte DESC'
+    ;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("❌ Error al obtener incidencias:", err);
+            return res.status(500).json({ error: "Error del servidor" });
+        }
         res.json(results);
     });
 });

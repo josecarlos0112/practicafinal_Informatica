@@ -56,3 +56,7 @@ h2 {
     background-color: white;
     color: black;
 }
+
+.toast {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
