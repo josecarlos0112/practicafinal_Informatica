@@ -228,3 +228,23 @@ app.get("/incidencias", authenticateToken, (req, res) => {
         res.json(results);
     });
 });
+
+app.get('/reservas', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+
+    const sql = `
+        SELECT r.id, r.fecha_reserva, r.estado, c.ubicacion, c.nivel_carga
+        FROM reservas r
+        JOIN cargadores c ON r.cargador_id = c.id
+        WHERE r.usuario_id = ?
+        ORDER BY r.fecha_reserva DESC
+    `;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error("❌ Error obteniendo reservas:", err);
+            return res.status(500).json({ error: "Error al obtener historial" });
+        }
+            res.json(results);
+        });
+    });

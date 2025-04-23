@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Inicializar mapa
-    const map = L.map('map').setView([40.4168, -3.7038], 15); // Centro en Madrid
+    window.map = L.map('map').setView([40.4168, -3.7038], 15); // Centro en Madrid
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -76,17 +76,57 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    async function cargarHistorialReservas() {
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch(`${API_BACKEND}/reservas`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const reservas = await response.json();
+            const tabla = document.getElementById("tablaReservas");
+            tabla.innerHTML = "";
+
+            reservas.forEach(reserva => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                <td>${reserva.id}</td>
+                <td>${reserva.ubicacion}</td>
+                <td>${new Date(reserva.fecha_reserva).toLocaleString()}</td>
+                <td>${reserva.nivel_carga ?? "N/A"}%</td>
+                <td><span class="badge bg-${reserva.estado === 'activa' ? 'success' : 'secondary'}">${reserva.estado}</span></td>
+            `;
+                tabla.appendChild(fila);
+            });
+
+        } catch (error) {
+            console.error("❌ Error cargando historial de reservas:", error);
+        }
+    }
+
+    // Función para reservar cargador
+    window.reservarCargador = function(chargerId, locationName) {
+        document.getElementById('ubicacionCargador').value = locationName;
+        document.getElementById('idCargador').value = chargerId;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalReserva'));
+        modal.show();
+    };
+
+
     document.getElementById('filtro-todos').addEventListener('click', () => mostrarCargadores('todos'));
     document.getElementById('filtro-libres').addEventListener('click', () => mostrarCargadores('libre'));
     document.getElementById('filtro-ocupados').addEventListener('click', () => mostrarCargadores('ocupado'));
-    document.getElementById('formReserva').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const formReserva = document.getElementById('formReserva');
+    formReserva?.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Previene el comportamiento predeterminado del formulario
 
         const token = localStorage.getItem('token');
-        const chargerId = document.getElementById('idCargador').value;
-        const locationName = document.getElementById('ubicacionCargador').value;
-        const fecha = document.getElementById('fechaReserva').value;
-        const hora = document.getElementById('horaReserva').value;
+        const chargerId = document.getElementById('idCargador')?.value;
+        const locationName = document.getElementById('ubicacionCargador')?.value;
+        const fecha = document.getElementById('fechaReserva')?.value;
+        const hora = document.getElementById('horaReserva')?.value;
 
         try {
             const res = await fetch(`${API_BACKEND}/reserve`, {
@@ -104,12 +144,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (res.ok) {
-                // alert('✅ Reserva realizada con éxito.');
                 const toast = new bootstrap.Toast(document.getElementById('toastReserva'));
                 toast.show();
                 setTimeout(() => window.location.reload(), 2500);
             } else {
-                // alert('⚠️ Error al realizar la reserva.');
                 const toast = new bootstrap.Toast(document.getElementById('toastError'));
                 toast.show();
             }
@@ -118,16 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     cargarCargadores();
+    cargarHistorialReservas();
 });
-
-// Función para reservar cargador
-function reservarCargador(chargerId, locationName) {
-    // Llenar datos en el modal
-    document.getElementById('ubicacionCargador').value = locationName;
-    document.getElementById('idCargador').value = chargerId;
-
-    // Mostrar el modal
-    const modal = new bootstrap.Modal(document.getElementById('modalReserva'));
-    modal.show();
-}
 
