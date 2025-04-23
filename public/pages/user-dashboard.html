@@ -142,7 +142,7 @@
 <!-- Footer -->
 <footer class="footer mt-auto py-3 bg-dark border-top border-secondary">
     <div class="container text-center">
-        <span class="text-muted">&copy; 2025 Encuentra tu Cargador. Todos los derechos reservados.</span>
+        <span>&copy; 2025 Encuentra tu Cargador. Todos los derechos reservados.</span>
     </div>
 </footer>
 
@@ -177,29 +177,77 @@
     window.addEventListener("DOMContentLoaded", () => {
         const navMapa = document.getElementById("navMapa");
         const navHistorial = document.getElementById("navHistorial");
+        const seccionMapa = document.getElementById("seccionMapa");
+        const seccionHistorial = document.getElementById("seccionHistorial");
+        const filtroBotones = document.getElementById("filtroBotones");
 
-        if (navMapa) {
-            navMapa.addEventListener("click", () => {
-                document.getElementById("seccionMapa").style.display = "block";
-                document.getElementById("seccionHistorial").style.display = "none";
-                document.getElementById("filtroBotones").style.display = "flex";
-                setTimeout(() => {
-                    if (typeof map !== 'undefined') {
-                        map.invalidateSize();
-                    }
-                }, 250);
-            });
+        function activarElemento(navActivo, navInactivo, mostrar, ocultar) {
+            navActivo.classList.add("active");
+            navInactivo.classList.remove("active");
+
+            mostrar.classList.remove("fade-out");
+            mostrar.classList.add("fade-in");
+            mostrar.style.display = "block";
+
+            ocultar.classList.remove("fade-in");
+            ocultar.classList.add("fade-out");
+            setTimeout(() => ocultar.style.display = "none", 200);
+
+            // Controlar visibilidad de la leyenda
+            const leyenda = document.querySelector(".info.legend");
+            if (mostrar.id === "seccionMapa") {
+                leyenda.style.display = "block"; // Mostrar la leyenda
+            } else {
+                leyenda.style.display = "none"; // Ocultar la leyenda
+            }
         }
 
-        if (navHistorial) {
+        if (navMapa && navHistorial) {
+            navMapa.addEventListener("click", () => {
+                activarElemento(navMapa, navHistorial, seccionMapa, seccionHistorial);
+                filtroBotones.style.display = "flex";
+                setTimeout(() => {
+                    if (typeof map !== 'undefined') map.invalidateSize();
+                }, 250);
+            });
+
             navHistorial.addEventListener("click", () => {
-                document.getElementById("seccionMapa").style.display = "none";
-                document.getElementById("seccionHistorial").style.display = "block";
-                document.getElementById("filtroBotones").style.display = "none";
+                activarElemento(navHistorial, navMapa, seccionHistorial, seccionMapa);
+                filtroBotones.style.display = "none";
+                if (typeof cargarHistorialReservas === 'function') {
+                    cargarHistorialReservas();
+                }
             });
         }
     });
 </script>
+<script>
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                const userCoords = [latitude, longitude];
+
+                map.setView(userCoords, 14);
+
+                L.marker(userCoords)
+                    .addTo(map)
+                    .bindPopup("Estás aquí 🔍")
+                    .openPopup();
+
+                cargarCargadores(latitude, longitude);
+            },
+            () => {
+                console.warn("Ubicación denegada, usando Madrid por defecto.");
+                cargarCargadores(defaultCoords[0], defaultCoords[1]);
+            }
+        );
+    } else {
+        console.warn("Navegador no soporta geolocalización.");
+        cargarCargadores(defaultCoords[0], defaultCoords[1]);
+    }
+</script>
+
 <script src="../js/reservations.js"></script>
 <script src="../js/user-map.js"></script>
 <script src="../js/dashboard.js"></script>
