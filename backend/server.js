@@ -203,6 +203,24 @@ app.put('/chargers/:id/estado', authenticateToken, (req, res) => {
     });
 });
 
+app.post('/chargers', authenticateToken, (req, res) => {
+    const { ubicacion, tipo, estado, nivel_carga, latitud, longitud } = req.body;
+
+    const sql = `
+    INSERT INTO cargadores (ubicacion, tipo, estado, nivel_carga, latitud, longitud, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, NOW())
+  `;
+
+    db.query(sql, [ubicacion, tipo, estado, nivel_carga, latitud, longitud], (err, result) => {
+        if (err) {
+            console.error("❌ Error al crear cargador:", err);
+            return res.status(500).json({ error: "Error al insertar cargador" });
+        }
+
+        res.json({ message: "Cargador creado con éxito" });
+    });
+});
+
 
 // 📌 Crear nueva incidencia
 app.post("/incidencias", authenticateToken, (req, res) => {

@@ -20,13 +20,20 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>${c.id}</td>
       <td>${c.ubicacion}</td>
       <td>${c.tipo}</td>
-      <td>${c.estado}</td>
       <td>${c.nivel_carga}%</td>
       <td>${c.latitud}, ${c.longitud}</td>
       <td>
-        <button class="btn btn-sm btn-warning" onclick="cambiarEstadoCargador(${c.id}, '${c.estado}')">Cambiar Estado</button>
+        <select class="form-select form-select-sm bg-dark text-white border-secondary"
+                onchange="actualizarEstadoCargador(${c.id}, this.value)">
+          <option value="libre" ${c.estado === 'libre' ? 'selected' : ''}>libre</option>
+          <option value="ocupado" ${c.estado === 'ocupado' ? 'selected' : ''}>ocupado</option>
+          <option value="en reparación" ${c.estado === 'en reparación' ? 'selected' : ''}>en reparación</option>
+        </select>
+      </td>
+      <td>
         <button class="btn btn-sm btn-danger" onclick="eliminarCargador(${c.id})">Eliminar</button>
       </td>
+
     `;
             tabla.appendChild(fila);
         });
@@ -131,6 +138,24 @@ document.addEventListener("DOMContentLoaded", () => {
         contenedor.appendChild(nav);
     }
 
+    window.actualizarEstadoCargador = async (id, nuevoEstado) => {
+        try {
+            await fetch(`http://localhost:5000/chargers/${id}/estado`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
+            });
+
+            // refresca la tabla
+            cargarCargadoresAdmin();
+        } catch (err) {
+            console.error("Error actualizando estado:", err);
+        }
+    };
+
 
     window.filtrarCargadores = function () {
         const texto = document.getElementById("buscadorCargadores").value.toLowerCase();
@@ -187,6 +212,42 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error eliminando cargador:", err);
         }
     };
+
+    document.getElementById("formNuevoCargador").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem("token");
+        const cargador = {
+            ubicacion: document.getElementById("ubicacionNuevo").value,
+            tipo: document.getElementById("tipoNuevo").value,
+            estado: document.getElementById("estadoNuevo").value,
+            nivel_carga: parseInt(document.getElementById("nivelNuevo").value),
+            latitud: parseFloat(document.getElementById("latitudNuevo").value),
+            longitud: parseFloat(document.getElementById("longitudNuevo").value)
+        };
+
+        try {
+            const res = await fetch("http://localhost:5000/chargers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(cargador)
+            });
+
+            if (res.ok) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalNuevoCargador"));
+                modal.hide();
+                cargarCargadoresAdmin();
+            } else {
+                console.error("Error creando cargador:", await res.text());
+            }
+        } catch (err) {
+            console.error("❌ Error creando cargador:", err);
+        }
+    });
+
 
     // Cargar al iniciar
     cargarCargadoresAdmin();
