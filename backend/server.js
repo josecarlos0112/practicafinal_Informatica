@@ -186,6 +186,23 @@ app.get('/chargers', authenticateToken, (req, res) => {
     });
 });
 
+// 📌 Ruta para actualizar un cargador
+app.put('/chargers/:id/estado', authenticateToken, (req, res) => {
+    const id = req.params.id;
+    const { estado } = req.body;
+
+    const sql = `UPDATE cargadores SET estado = ? WHERE id = ?`;
+
+    db.query(sql, [estado, id], (err, result) => {
+        if (err) {
+            console.error("❌ Error actualizando estado:", err);
+            return res.status(500).json({ error: "Error al actualizar estado" });
+        }
+
+        res.json({ message: "Estado actualizado correctamente" });
+    });
+});
+
 
 // 📌 Crear nueva incidencia
 app.post("/incidencias", authenticateToken, (req, res) => {
